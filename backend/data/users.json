@@ -1,0 +1,118 @@
+[
+  {
+    "id": "1761926827652",
+    "fullName": "John Doe",
+    "email": "doe321973@gmail.com",
+    "phone": "08085319092",
+    "password": "$2b$10$SmD.ZEQLcKbllVhy5k68MeCpiEQSqIq.Dh8t0OKnhu9VdQ9X2/aAa",
+    "savedRecipes": [
+      {
+        "dishName": "Egusi Soup",
+        "description": "A rich and savory Nigerian soup made with ground melon seeds, leafy greens, and meat or fish.",
+        "ingredients": [
+          {
+            "name": "Ground egusi (melon seeds)",
+            "qty": "1.5",
+            "unit": "cups",
+            "note": ""
+          },
+          {
+            "name": "Beef or assorted meats",
+            "qty": "500",
+            "unit": "g",
+            "note": "cubed"
+          },
+          {
+            "name": "Smoked fish",
+            "qty": "1",
+            "unit": "medium",
+            "note": "cleaned"
+          },
+          {
+            "name": "Palm oil",
+            "qty": "0.5",
+            "unit": "cup",
+            "note": ""
+          },
+          {
+            "name": "Spinach or ugwu leaves",
+            "qty": "1",
+            "unit": "bunch",
+            "note": "chopped"
+          },
+          {
+            "name": "Red bell pepper",
+            "qty": "1",
+            "unit": "",
+            "note": "blended"
+          },
+          {
+            "name": "Onion",
+            "qty": "1",
+            "unit": "large",
+            "note": "chopped"
+          },
+          {
+            "name": "Crayfish",
+            "qty": "0.25",
+            "unit": "cup",
+            "note": "ground"
+          },
+          {
+            "name": "Stock cubes",
+            "qty": "2",
+            "unit": "",
+            "note": ""
+          },
+          {
+            "name": "Water or stock",
+            "qty": "3",
+            "unit": "cups",
+            "note": ""
+          }
+        ],
+        "steps": [
+          "Boil the beef with chopped onion and stock cubes until tender. Set aside, reserving the stock.",
+          "Make a thick paste with the ground egusi and a little water. Heat palm oil in a separate pot and fry the egusi paste in clumps until golden.",
+          "Pour in the blended pepper and cook for 5 minutes.",
+          "Add the beef stock, cooked beef, smoked fish, and ground crayfish. Stir gently and bring to a simmer.",
+          "Cover and cook for 20 minutes, allowing the flavors to meld and the egusi to cook through.",
+          "Add the chopped spinach or ugwu leaves and stir until just wilted, about 3-5 minutes.",
+          "Season with salt to taste. Do not over-stir after adding the vegetables.",
+          "Serve hot with fufu, pounded yam, or eba."
+        ],
+        "prepTimeMin": 20,
+        "cookTimeMin": 60,
+        "servings": 6,
+        "difficulty": "Medium",
+        "cuisineType": "Nigerian",
+        "mealType": "Dinner",
+        "tags": [
+          "hearty",
+          "savory",
+          "traditional"
+        ],
+        "mood": "cozy",
+        "weatherSuggestion": "rainy",
+        "timeSuggestion": "evening",
+        "imageUrl": "https://source.unsplash.com/800x600/?Egusi%20Soup,food",
+        "id": "1761945563243",
+        "savedAt": "2025-10-31T21:19:23.243Z"
+      }
+    ]
+  },
+  {
+    "id": "1761950041849",
+    "googleId": "116692787935299116639",
+    "fullName": "Design Dutme",
+    "email": "designdutme@gmail.com",
+    "savedRecipes": []
+  },
+  {
+    "id": "1761950563240",
+    "githubId": "234036478",
+    "fullName": "designdutme-boop",
+    "email": "designdutme@gmail.com",
+    "savedRecipes": []
+  }
+]

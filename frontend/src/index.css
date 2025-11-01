@@ -1,0 +1,221 @@
+/* index.css */
+
+/* ... (Your existing floating icon CSS and scrollbar removal) ... */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-primary: #ffffff;
+    --bg-surface: #f8f9fa;
+    --text-primary: #0a0a0a;
+    --text-secondary: rgba(0,0,0,0.7);
+    --accent-primary: #10b981;
+    --accent-secondary: #059669;
+    --border-color: rgba(0,0,0,0.08);
+  }
+
+  .dark {
+    --bg-primary: #000000;
+    --bg-surface: #0a0a0a;
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255,255,255,0.7);
+    --accent-primary: #10b981;
+    --accent-secondary: #059669;
+    --border-color: rgba(255,255,255,0.08);
+  }
+
+  .border-border {
+    border-color: var(--border-color);
+  }
+
+  :root {
+    --headline-color: #001d00;
+  }
+
+  .dark {
+    --headline-color: #ffffff;
+  }
+
+  html {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    scroll-behavior: smooth;
+    font-size: 14px; /* Default base font size for larger screens (e.g., desktop) */
+  }
+
+  /* Adjustments for tablets and medium screens */
+  @media (min-width: 768px) {
+    html {
+      font-size: 15px; /* Slightly smaller than desktop base, but still comfortable */
+    }
+  }
+
+  /* Mobile-specific base font size - makes everything using `rem` smaller */
+  @media (max-width: 767px) { /* Targets screens smaller than 768px (standard Tailwind 'md' breakpoint) */
+    html {
+      font-size: 12px; /* Reduced from 14px (or your previous 16px) to 12px for mobile */
+    }
+  }
+
+  /* Even smaller for very small screens (e.g., iPhone 5/SE) if needed, but be careful with readability */
+  @media (max-width: 374px) { /* e.g., for screens <= 374px wide */
+    html {
+      font-size: 11px; /* Further reduction for extremely small screens */
+    }
+  }
+
+  body {
+    @apply antialiased transition-colors duration-300;
+    background: transparent;
+    color: var(--text-primary);
+    overflow-x: hidden;
+    font-size: 1rem; /* This will now be 16px on desktop, 12px on mobile etc. */
+    line-height: 1.4;
+  }
+
+  /* MOBILE-FIRST FONT SIZES - These will now scale based on the root HTML font-size */
+  /* These `rem` values will inherently be smaller when html font-size is smaller */
+  h1 {
+    font-size: 2rem; /* Was 1.75rem, increased slightly as base is smaller now */
+    font-weight: 800;
+    line-height: 1.2;
+  }
+
+  h2 {
+    font-size: 1.5rem; /* Was 1.5rem, maintains relative size */
+    font-weight: 800;
+    line-height: 1.3;
+  }
+
+  h3 {
+    font-size: 1.25rem; /* Was 1.25rem, maintains relative size */
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  p, .text-base {
+    font-size: 1rem; /* Was 0.875rem, setting to 1rem for better readability with smaller base */
+    line-height: 1.5;
+  }
+
+  /* Larger fonts for desktop (these will be relative to 14px html font-size) */
+  @media (min-width: 768px) {
+    h1 {
+      font-size: 3rem;
+    }
+
+    h2 {
+      font-size: 2.25rem;
+    }
+
+    h3 {
+      font-size: 1.5rem;
+    }
+
+    p, .text-base {
+      font-size: 1rem;
+    }
+  }
+
+  /* Even larger for big screens */
+  @media (min-width: 1024px) {
+    h1 {
+      font-size: 3.5rem;
+    }
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply relative overflow-hidden bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-2 px-4 md:py-3 md:px-6 rounded-xl text-sm md:text-base transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl;
+  }
+
+  .btn-primary::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-200%];
+    animation: shimmer 3s infinite;
+  }
+
+  .btn-secondary {
+    @apply bg-white dark:bg-gray-900 backdrop-blur-xl border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 font-bold py-2 px-4 md:py-3 md:px-6 rounded-xl text-sm md:text-base transition-all duration-300 hover:border-green-500 hover:shadow-md;
+  }
+
+  .glass-card {
+    @apply bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border border-white/20 dark:border-gray-800/50 shadow-lg;
+  }
+
+  .glass-header {
+    @apply bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-white/20 dark:border-gray-800/50;
+  }
+
+  /* Responsive text gradients */
+  .text-gradient {
+    @apply bg-gradient-to-r from-green-500 via-emerald-500 to-green-600 bg-clip-text text-transparent;
+    font-size: inherit;
+  }
+
+  /* Mobile-optimized inputs */
+  input[type="text"],
+  select {
+    @apply transition-all duration-300 text-sm md:text-base py-2 px-3 md:py-3 md:px-4;
+    min-height: 44px; /* Better touch targets */
+  }
+
+  input[type="text"]:focus,
+  select:focus {
+    @apply ring-1 ring-green-500;
+  }
+}
+
+/* Remove ALL custom scrollbar styles - they conflict with scrollbar removal */
+/* ... (Your existing keyframes and utility classes) ... */
+
+/* MOBILE-FIRST RESPONSIVE DESIGN - Refined to work with new base font sizes */
+@media (max-width: 767px) { /* Target mobile devices */
+  .glass-card {
+    @apply bg-white/90 dark:bg-gray-900/90 backdrop-blur-md;
+  }
+
+  .btn-primary, .btn-secondary {
+    /* These now inherit text-sm, so py/px might need slight adjustment */
+    @apply py-2 px-4 min-h-[40px];
+  }
+
+  /* General mobile padding adjustments for wider elements if needed */
+  .mobile-wide-padding {
+    @apply px-4 py-6;
+  }
+}
+
+/* Better touch interactions on mobile */
+@media (hover: none) and (pointer: coarse) {
+  .btn-primary, .btn-secondary, button {
+    @apply min-h-[44px];
+  }
+
+  /* Disable hover effects on touch devices */
+  .card-hover:hover {
+    transform: none;
+  }
+}
+
+/* Utility classes for responsive spacing */
+/* Adjust these to be more aggressive on mobile if needed */
+.mobile-py {
+  @apply py-4 md:py-8; /* Keeps existing behavior, scales with rem */
+}
+
+.mobile-px {
+  @apply px-3 md:px-6; /* Keeps existing behavior, scales with rem */
+}
+
+.mobile-text {
+  @apply text-sm md:text-base; /* This will now be smaller due to html font-size */
+}
+
+.mobile-heading {
+  @apply text-xl md:text-3xl; /* This will now be smaller due to html font-size */
+}

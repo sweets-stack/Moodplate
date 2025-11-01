@@ -1,0 +1,27 @@
+# CSV Structure Guide for recipes_dataset.csv
+
+Your CSV file should have these columns (in any order):
+
+Required columns:
+- dish_name: Name of the dish
+- description: Brief description
+- mood: happy, cozy, energetic, relaxed, excited, cold, warm, celebratory
+- cuisine_type: Italian, Chinese, Mexican, etc.
+- meal_type: breakfast, lunch, dinner, snack, dessert
+- difficulty: easy, medium, hard
+
+Optional columns:
+- ingredients_json: JSON array of ingredients OR semicolon-separated list
+- steps_json: JSON array of steps OR semicolon-separated list
+- prep_time_min: Preparation time in minutes
+- cook_time_min: Cooking time in minutes
+- servings: Number of servings
+- tags: Comma-separated tags
+- weather_suggestion: sunny, cloudy, rainy, snowy, windy, any
+- time_suggestion: morning, afternoon, evening, night, any
+
+Example row:
+Spaghetti Carbonara,Classic Italian pasta,"[{""name"":""Spaghetti"",""qty"":""400"",""unit"":""g""}]","[""Boil pasta"",""Mix eggs and cheese""]",10,15,4,easy,Italian,dinner,"pasta,italian,quick",happy,any,evening
+
+Or simpler format:
+Spaghetti Carbonara,Classic Italian pasta,Spaghetti 400g; Eggs 4; Cheese 100g,Boil pasta; Mix eggs and cheese; Combine,10,15,4,easy,Italian,dinner,pasta;italian;quick,happy,any,evening
