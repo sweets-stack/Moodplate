@@ -1,11 +1,8 @@
-﻿import dotenv from 'dotenv';
+﻿// backend/server.js
+import dotenv from 'dotenv';
 
-// Load environment variables based on environment
-if (process.env.NODE_ENV === 'production') {
-  dotenv.config(); // Render will provide env vars
-} else {
-  dotenv.config(); // Local development
-}
+// Load environment variables
+dotenv.config();
 
 import express from 'express';
 import session from 'express-session';
@@ -22,10 +19,15 @@ import passportConfig from './config/passport-setup.js';
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+console.log('🚀 Starting Moodplate backend...');
+
+// Connect to MongoDB
+connectDB();
+
 // Security middleware
 app.use(helmet());
 
-// CORS configuration for production
+// CORS configuration
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:5173',
   credentials: true,
@@ -36,18 +38,18 @@ app.use(express.urlencoded({ extended: true }));
 
 // Rate limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: process.env.NODE_ENV === 'production' ? 100 : 1000 // stricter in production
+  windowMs: 15 * 60 * 1000,
+  max: 100
 });
 app.use(limiter);
 
-// Session configuration for production
+// Session configuration
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'fallback_secret',
+  secret: process.env.SESSION_SECRET || 'dev_secret',
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: process.env.NODE_ENV === 'production', // HTTPS in production
+    secure: false,
     maxAge: 24 * 60 * 60 * 1000
   }
 }));
@@ -68,12 +70,26 @@ app.use('/api/user', userRoutes);
 app.get('/api/health', (req, res) => {
   res.json({ 
     status: 'OK',
-    environment: process.env.NODE_ENV,
+    environment: process.env.NODE_ENV || 'development',
     timestamp: new Date().toISOString()
   });
 });
 
+// 404 handler
+app.use('*', (req, res) => {
+  res.status(404).json({ error: 'Route not found' });
+});
+
+// Error handling
+app.use((error, req, res, next) => {
+  console.error('Server error:', error);
+  res.status(500).json({ error: 'Internal server error' });
+});
+
 // Start server
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Moodplate ${process.env.NODE_ENV} server running on port ${PORT}`);
+  console.log(`🚀 Moodplate backend running on port ${PORT}`);
+  console.log(`📍 Health check: http://localhost:${PORT}/api/health`);
 });
+
+export default app;
