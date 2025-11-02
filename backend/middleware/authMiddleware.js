@@ -1,33 +1,27 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 
-export const protect = async (req, res, next) => {
+const auth = async (req, res, next) => {
   try {
-    let token;
-
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-      token = req.headers.authorization.split(' ')[1];
-    }
-
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+    
     if (!token) {
-      return res.status(401).json({ error: 'Not authorized, no token' });
+      return res.status(401).json({ error: 'No token, authorization denied' });
     }
 
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const user = await User.findById(decoded.id).select('-password');
-      
-      if (!user) {
-        return res.status(401).json({ error: 'Not authorized, user not found' });
-      }
-
-      req.user = user;
-      next();
-    } catch (error) {
-      return res.status(401).json({ error: 'Not authorized, token failed' });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'moodplate_fallback_jwt_secret_2024_development_only');
+    const user = await User.findById(decoded.id).select('-password');
+    
+    if (!user) {
+      return res.status(401).json({ error: 'Token is not valid' });
     }
+
+    req.user = user;
+    next();
   } catch (error) {
     console.error('Auth middleware error:', error);
-    res.status(500).json({ error: 'Server error in authentication' });
+    res.status(401).json({ error: 'Token is not valid' });
   }
 };
+
+export default auth;

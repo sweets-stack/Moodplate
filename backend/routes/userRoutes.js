@@ -1,68 +1,78 @@
+// backend/routes/userRoutes.js
 import express from 'express';
-import { protect } from '../middleware/authMiddleware.js';
+import auth from '../middleware/auth.js';
 import User from '../models/User.js';
 
 const router = express.Router();
 
-router.get('/recipes', protect, async (req, res) => {
+// Get user's saved recipes - FIXED
+router.get('/recipes', auth, async (req, res) => {
   try {
+    console.log('📥 Fetching saved recipes for user:', req.user.id);
+    
     const user = await User.findById(req.user.id);
-    if (user) {
-      res.json(user.savedRecipes || []);
-    } else {
-      res.status(404).json({ error: 'User not found' });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
     }
+    
+    console.log('✅ User found, saved recipes:', user.savedRecipes?.length || 0);
+    res.json({
+      savedRecipes: user.savedRecipes || []
+    });
   } catch (error) {
-    console.error('Get saved recipes error:', error);
+    console.error('❌ Error fetching saved recipes:', error);
     res.status(500).json({ error: 'Failed to fetch saved recipes' });
   }
 });
 
-router.post('/recipes', protect, async (req, res) => {
+// Save a recipe - FIXED
+router.post('/recipes', auth, async (req, res) => {
   try {
-    const newRecipe = req.body;
-    const user = await User.findById(req.user.id);
-
-    if (user) {
-      if (!user.savedRecipes) user.savedRecipes = [];
-      
-      // Check if recipe already exists
-      const recipeExists = user.savedRecipes.some(r => r.dishName === newRecipe.dishName);
-      
-      if (!recipeExists) {
-        user.savedRecipes.push({
-          ...newRecipe,
-          savedAt: new Date()
-        });
-        await user.save();
-        res.status(201).json(user.savedRecipes);
-      } else {
-        res.status(409).json({ error: 'Recipe already saved' });
-      }
-    } else {
-      res.status(404).json({ error: 'User not found' });
+    const { recipeId, recipeData } = req.body;
+    
+    console.log('💾 Saving recipe for user:', req.user.id);
+    console.log('📝 Recipe data:', { recipeId, dishName: recipeData?.dishName });
+    
+    if (!recipeId || !recipeData) {
+      return res.status(400).json({ error: 'Recipe ID and data are required' });
     }
+
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Initialize savedRecipes array if it doesn't exist
+    if (!user.savedRecipes) {
+      user.savedRecipes = [];
+    }
+
+    // Check if recipe is already saved
+    const alreadySaved = user.savedRecipes.some(recipe => 
+      recipe.id === recipeId || recipe._id === recipeId
+    );
+
+    if (alreadySaved) {
+      return res.status(409).json({ error: 'Recipe already saved' });
+    }
+
+    // Add recipe to saved recipes
+    user.savedRecipes.push({
+      id: recipeId,
+      ...recipeData,
+      savedAt: new Date()
+    });
+
+    await user.save();
+    console.log('✅ Recipe saved successfully');
+
+    res.json({
+      message: 'Recipe saved successfully',
+      savedRecipes: user.savedRecipes
+    });
   } catch (error) {
-    console.error('Save recipe error:', error);
+    console.error('❌ Error saving recipe:', error);
     res.status(500).json({ error: 'Failed to save recipe' });
-  }
-});
-
-router.delete('/recipes/:id', protect, async (req, res) => {
-  try {
-    const recipeId = req.params.id;
-    const user = await User.findById(req.user.id);
-
-    if (user) {
-      user.savedRecipes = user.savedRecipes.filter(r => r._id.toString() !== recipeId);
-      await user.save();
-      res.json(user.savedRecipes);
-    } else {
-      res.status(404).json({ error: 'User not found' });
-    }
-  } catch (error) {
-    console.error('Delete recipe error:', error);
-    res.status(500).json({ error: 'Failed to delete recipe' });
   }
 });
 
