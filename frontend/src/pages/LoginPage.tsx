@@ -92,13 +92,13 @@ const LoginPage: React.FC = () => {
       </div>
 
       {/* Right Side - Login Form */}
-      <div className="flex flex-col items-center justify-center w-full p-4 sm:p-6 lg:p-8 min-h-screen">
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-          className="w-full max-w-sm sm:max-w-md"
-        >
+      <div className="flex flex-col items-center justify-center w-full p-4 sm:p-6 lg:p-8 min-h-screen lg:min-h-0 lg:py-8">
+  <motion.div 
+    initial={{ opacity: 0, scale: 0.95 }}
+    animate={{ opacity: 1, scale: 1 }}
+    transition={{ duration: 0.5 }}
+    className="w-full max-w-sm sm:max-w-md mt-8 lg:mt-0"
+  >
           <div className="bg-white dark:bg-gray-900/50 p-6 sm:p-8 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-800">
             <h2 className="text-xl sm:text-2xl font-bold text-center">Welcome back! 👋</h2>
             <p className="text-center text-xs sm:text-sm text-gray-500 mt-1">

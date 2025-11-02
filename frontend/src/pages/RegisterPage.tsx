@@ -63,7 +63,7 @@ const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black text-gray-900 dark:text-gray-100 flex lg:grid lg:grid-cols-2">
+    <div className="min-h-screen bg-white dark:bg-black text-gray-900 dark:text-gray-100 flex lg:grid lg:grid-cols-2 pt-16 lg:pt-0">
       {/* Left Side - Feature Showcase (Desktop only) - Full Height */}
       <div className="hidden lg:flex flex-col items-start justify-center p-8 xl:p-12 bg-gradient-to-br from-green-400 via-emerald-500 to-green-600 text-white min-h-screen">
         <motion.div 
@@ -91,13 +91,13 @@ const RegisterPage: React.FC = () => {
         </motion.div>
       </div>
 
-      {/* Right Side - Registration Form */}
-      <div className="flex flex-col items-center justify-center w-full p-4 sm:p-6 lg:p-8 min-h-screen">
+      {/* Right Side - Registration Form - Fixed padding for header */}
+      <div className="flex flex-col items-center justify-center w-full p-4 sm:p-6 lg:p-8 min-h-screen lg:min-h-0 lg:py-8">
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
-          className="w-full max-w-sm sm:max-w-md"
+          className="w-full max-w-sm sm:max-w-md mt-8 lg:mt-0"
         >
           <div className="bg-white dark:bg-gray-900/50 p-6 sm:p-8 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-800">
             <h2 className="text-xl sm:text-2xl font-bold text-center">Create an account.</h2>
@@ -160,7 +160,7 @@ const RegisterPage: React.FC = () => {
               />
               
               <p className="text-xs text-gray-500 text-center pt-1 sm:pt-2">
-                By signing up, you agree to our <a href="#" className="underline">Terms of Use</a> and <a href="#" className="underline">Privacy Policy</a>.
+                By signing up, you agree to our <Link to="/terms-of-service" className="underline hover:text-green-500">Terms of Use</Link> and <Link to="/privacy-policy" className="underline hover:text-green-500">Privacy Policy</Link>.
               </p>
               
               <button 
