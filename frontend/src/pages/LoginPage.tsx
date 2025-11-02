@@ -177,14 +177,14 @@ const LoginPage: React.FC = () => {
             
             <div className="grid grid-cols-2 gap-3 sm:gap-4">
               <a 
-                href="http://localhost:3001/api/auth/github" 
+                href="http://moodplate-backend.onrender.com/api/auth/github" 
                 className="w-full flex items-center justify-center gap-2 sm:gap-3 py-2 sm:py-3 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition text-xs sm:text-sm"
               >
                 <FaGithub className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span className="font-semibold">Github</span>
               </a>
               <a 
-                href="http://localhost:3001/api/auth/google" 
+                href="http://moodplate-backend.onrender.com/api/auth/google" 
                 className="w-full flex items-center justify-center gap-2 sm:gap-3 py-2 sm:py-3 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition text-xs sm:text-sm"
               >
                 <FcGoogle className="w-4 h-4 sm:w-5 sm:h-5" />

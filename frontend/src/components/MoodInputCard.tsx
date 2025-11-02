@@ -67,7 +67,7 @@ const MoodInputCard: React.FC<MoodInputCardProps> = ({ onGenerateRecipe, isLoadi
   useEffect(() => {
     const loadFilterOptions = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/recipes/filters');
+        const response = await fetch('http://moodplate-backend.onrender.com/api/recipes/filters');
         if (response.ok) {
           const options = await response.json();
           setFilterOptions(options);
