@@ -96,14 +96,14 @@ const Footer: React.FC = () => {
       >
         <div className="flex flex-wrap justify-center gap-4 md:gap-6 text-xs md:text-sm text-gray-600 dark:text-gray-400">
           <motion.a
-            href="/PrivacyPolicyPage"
+            href="/privacy-policy"
             className="hover:text-green-600 dark:hover:text-green-400 transition-colors duration-300"
             whileHover={{ y: -1 }}
           >
             Privacy Policy
           </motion.a>
           <motion.a
-            href="/TermsOfServicePage"
+            href="/terms-of-service"
             className="hover:text-green-600 dark:hover:text-green-400 transition-colors duration-300"
             whileHover={{ y: -1 }}
           >

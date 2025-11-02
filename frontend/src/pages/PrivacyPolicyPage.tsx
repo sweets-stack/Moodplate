@@ -4,131 +4,156 @@ import { Link } from 'react-router-dom';
 
 const PrivacyPolicyPage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-white dark:bg-black pt-20">
-      <div className="container mx-auto px-4 py-12">
+    <div className="min-h-screen bg-white dark:bg-black text-gray-900 dark:text-gray-100 pt-16">
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="max-w-4xl mx-auto"
+          transition={{ duration: 0.5 }}
         >
           {/* Header */}
-          <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-4">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl md:text-4xl font-black text-gray-900 dark:text-white mb-4">
               Privacy Policy
             </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-400">
+            <p className="text-gray-600 dark:text-gray-400">
               Last updated: {new Date().toLocaleDateString()}
             </p>
           </div>
 
-          {/* Content */}
-          <div className="bg-white dark:bg-gray-900 rounded-2xl p-8 shadow-lg border border-gray-200 dark:border-gray-800">
-            <div className="prose prose-lg dark:prose-invert max-w-none">
-              <section className="mb-8">
-                <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-4">
-                  1. Information We Collect
-                </h2>
-                <p className="text-gray-600 dark:text-gray-400 mb-4">
-                  Moodplate collects minimal information to provide our recipe generation service:
-                </p>
-                <ul className="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-2 ml-4">
-                  <li>Mood preferences and recipe selections</li>
-                  <li>Saved recipes (stored locally on your device)</li>
-                  <li>Anonymous usage data to improve our service</li>
-                  <li>No personal identification information is collected</li>
-                </ul>
-              </section>
-
-              <section className="mb-8">
-                <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-4">
-                  2. How We Use Your Information
-                </h2>
-                <p className="text-gray-600 dark:text-gray-400 mb-4">
-                  We use the collected information to:
-                </p>
-                <ul className="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-2 ml-4">
-                  <li>Generate personalized recipes based on your mood</li>
-                  <li>Improve our recipe recommendation algorithm</li>
-                  <li>Provide a better user experience</li>
-                  <li>Ensure the service functions correctly</li>
-                </ul>
-              </section>
-
-              <section className="mb-8">
-                <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-4">
-                  3. Data Storage & Security
-                </h2>
-                <p className="text-gray-600 dark:text-gray-400 mb-4">
-                  Your data is important to us:
-                </p>
-                <ul className="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-2 ml-4">
-                  <li>Saved recipes are stored locally in your browser</li>
-                  <li>We don't store personal information on our servers</li>
-                  <li>All data transmission is encrypted</li>
-                  <li>You can clear your data at any time by clearing browser storage</li>
-                </ul>
-              </section>
-
-              <section className="mb-8">
-                <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-4">
-                  4. Third-Party Services
-                </h2>
-                <p className="text-gray-600 dark:text-gray-400">
-                  We use minimal third-party services:
-                </p>
-                <ul className="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-2 ml-4">
-                  <li>Unsplash for recipe images (anonymous requests)</li>
-                  <li>Vercel for hosting (GDPR compliant)</li>
-                  <li>No advertising or tracking services</li>
-                </ul>
-              </section>
-
-              <section className="mb-8">
-                <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-4">
-                  5. Your Rights
-                </h2>
-                <p className="text-gray-600 dark:text-gray-400 mb-4">
-                  You have the right to:
-                </p>
-                <ul className="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-2 ml-4">
-                  <li>Access any data we might have about you</li>
-                  <li>Request deletion of your data</li>
-                  <li>Opt-out of data collection</li>
-                  <li>Export your saved recipes</li>
-                </ul>
-              </section>
-
-              <section className="mb-8">
-                <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-4">
-                  6. Contact Us
-                </h2>
-                <p className="text-gray-600 dark:text-gray-400">
-                  If you have any questions about this Privacy Policy, please contact us at:{' '}
-                  <a 
-                    href="mailto:privacy@moodplate.com" 
-                    className="text-green-600 dark:text-green-400 hover:underline"
-                  >
-                    privacy@moodplate.com
-                  </a>
-                </p>
-              </section>
-            </div>
+          {/* Back Button */}
+          <div className="mb-8">
+            <Link 
+              to="/" 
+              className="inline-flex items-center text-green-500 hover:text-green-600 font-semibold transition-colors"
+            >
+              ← Back to Home
+            </Link>
           </div>
 
-          {/* Back to Home */}
-          <motion.div
-            className="text-center mt-8"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <Link
-              to="/"
-              className="inline-block bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold py-3 px-6 rounded-2xl hover:shadow-lg transition-all duration-300"
+          {/* Content */}
+          <div className="bg-white dark:bg-gray-900/50 rounded-2xl p-6 md:p-8 shadow-lg border border-gray-200 dark:border-gray-800 space-y-6">
+            <section>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">1. Information We Collect</h2>
+              <div className="space-y-3 text-gray-700 dark:text-gray-300">
+                <p>
+                  We collect information that you provide directly to us when you use Moodplate:
+                </p>
+                <ul className="list-disc list-inside space-y-2 ml-4">
+                  <li><strong>Account Information:</strong> When you create an account, we collect your name, email address, and password.</li>
+                  <li><strong>Profile Information:</strong> Optional information like your phone number if you choose to provide it.</li>
+                  <li><strong>Recipe Preferences:</strong> Your mood inputs, saved recipes, and cooking preferences.</li>
+                  <li><strong>Usage Data:</strong> Information about how you interact with our service.</li>
+                </ul>
+              </div>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">2. How We Use Your Information</h2>
+              <div className="space-y-3 text-gray-700 dark:text-gray-300">
+                <p>We use the information we collect to:</p>
+                <ul className="list-disc list-inside space-y-2 ml-4">
+                  <li>Provide, maintain, and improve our services</li>
+                  <li>Personalize your recipe recommendations based on your mood and preferences</li>
+                  <li>Communicate with you about updates, security alerts, and support messages</li>
+                  <li>Protect against fraud and abuse</li>
+                  <li>Develop new features and services</li>
+                </ul>
+              </div>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">3. Information Sharing</h2>
+              <div className="space-y-3 text-gray-700 dark:text-gray-300">
+                <p>We do not sell, trade, or rent your personal information to third parties. We may share your information in the following circumstances:</p>
+                <ul className="list-disc list-inside space-y-2 ml-4">
+                  <li><strong>Service Providers:</strong> With vendors who help us operate our service</li>
+                  <li><strong>Legal Requirements:</strong> When required by law or to protect our rights</li>
+                  <li><strong>Business Transfers:</strong> In connection with a merger or sale of assets</li>
+                </ul>
+              </div>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">4. Data Security</h2>
+              <div className="space-y-3 text-gray-700 dark:text-gray-300">
+                <p>
+                  We implement appropriate security measures to protect your personal information. 
+                  This includes encryption, secure servers, and regular security assessments. 
+                  However, no method of transmission over the Internet is 100% secure.
+                </p>
+              </div>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">5. Your Rights</h2>
+              <div className="space-y-3 text-gray-700 dark:text-gray-300">
+                <p>You have the right to:</p>
+                <ul className="list-disc list-inside space-y-2 ml-4">
+                  <li>Access and update your personal information</li>
+                  <li>Delete your account and associated data</li>
+                  <li>Opt-out of marketing communications</li>
+                  <li>Export your data</li>
+                </ul>
+              </div>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">6. Cookies and Tracking</h2>
+              <div className="space-y-3 text-gray-700 dark:text-gray-300">
+                <p>
+                  We use cookies and similar technologies to enhance your experience, 
+                  analyze usage, and deliver personalized content. You can control 
+                  cookies through your browser settings.
+                </p>
+              </div>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">7. Children's Privacy</h2>
+              <div className="space-y-3 text-gray-700 dark:text-gray-300">
+                <p>
+                  Our service is not intended for children under 13. We do not knowingly 
+                  collect personal information from children under 13.
+                </p>
+              </div>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">8. Changes to This Policy</h2>
+              <div className="space-y-3 text-gray-700 dark:text-gray-300">
+                <p>
+                  We may update this privacy policy from time to time. We will notify you 
+                  of any changes by posting the new policy on this page and updating the 
+                  "Last updated" date.
+                </p>
+              </div>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">9. Contact Us</h2>
+              <div className="space-y-3 text-gray-700 dark:text-gray-300">
+                <p>
+                  If you have any questions about this Privacy Policy, please contact us at:
+                </p>
+                <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
+                  <p className="font-semibold">SweetStack</p>
+                  <p>Email: sweetadetoye@gmail.com</p>
+                  <p>Twitter: @sweetsstack</p>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          {/* Back to Top */}
+          <div className="mt-8 text-center">
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="text-green-500 hover:text-green-600 font-semibold transition-colors"
             >
-              Back to Home
-            </Link>
-          </motion.div>
+              ↑ Back to Top
+            </button>
+          </div>
         </motion.div>
       </div>
     </div>
