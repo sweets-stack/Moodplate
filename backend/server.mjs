@@ -31,8 +31,8 @@ app.set('trust proxy', 1);
 connectDB();
 
 // Security middleware
-// FIX: Removed ineffective JSDoc type cast to resolve "No overload matches this call" error.
-app.use(helmet());
+// FIX: Explicitly provide a path to resolve "No overload matches this call" error.
+app.use('/', helmet());
 
 // CORS configuration
 const allowedOrigins = [
@@ -56,10 +56,10 @@ const corsOptions = {
 };
 
 // Enable CORS with options
-// FIX: Removed ineffective JSDoc type cast to resolve "No overload matches this call" error.
-app.use(cors(corsOptions));
+// FIX: Explicitly provide a path to resolve "No overload matches this call" error.
+app.use('/', cors(corsOptions));
 // Explicitly handle pre-flight requests for all routes
-// FIX: Removed ineffective JSDoc type cast to resolve "No overload matches this call" error.
+// FIX: Removed problematic type cast to resolve "No overload matches this call" error.
 app.options('*', cors(corsOptions));
 
 
@@ -71,12 +71,12 @@ const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100
 });
-// FIX: Removed ineffective JSDoc type cast to resolve "No overload matches this call" error.
-app.use(limiter);
+// FIX: Explicitly provide a path to resolve "No overload matches this call" error.
+app.use('/', limiter);
 
 // Session configuration
-// FIX: Removed ineffective JSDoc type cast to resolve "No overload matches this call" error.
-app.use(session({
+// FIX: Explicitly provide a path to resolve "No overload matches this call" error.
+app.use('/', session({
   secret: process.env.SESSION_SECRET || 'dev_secret',
   resave: false,
   saveUninitialized: false,

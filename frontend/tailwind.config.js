@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class', // Enable class-based dark mode
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
@@ -18,7 +19,6 @@ export default {
           700: '#15803d',
           800: '#166534',
           900: '#14532d',
-        }
         }
       },
       animation: {
@@ -51,6 +51,6 @@ export default {
         'mood-relaxed': 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
       }
     },
-  
+  },
   plugins: [],
 }
