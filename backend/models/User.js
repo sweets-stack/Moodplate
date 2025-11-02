@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Full name is required'],
     trim: true,
-    maxlength: [100, 'Full name cannot be more than 100 characters']
+    maxlength: [100, 'Full name cannot exceed 100 characters']
   },
   email: {
     type: String,
@@ -24,43 +24,20 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Password is required'],
     minlength: [6, 'Password must be at least 6 characters']
-  },
-  savedRecipes: [{
-    dishName: String,
-    description: String,
-    ingredients: [{
-      name: String,
-      qty: String,
-      unit: String,
-      note: String
-    }],
-    steps: [String],
-    prepTimeMin: Number,
-    cookTimeMin: Number,
-    servings: Number,
-    difficulty: String,
-    cuisineType: String,
-    mealType: String,
-    tags: [String],
-    mood: String,
-    weatherSuggestion: String,
-    timeSuggestion: String,
-    imageUrl: String,
-    savedAt: {
-      type: Date,
-      default: Date.now
-    }
-  }]
+  }
 }, {
   timestamps: true
 });
 
 // Hash password before saving
 userSchema.pre('save', async function(next) {
+  // Only hash the password if it's modified (or new)
   if (!this.isModified('password')) return next();
   
   try {
-    this.password = await bcrypt.hash(this.password, 12);
+    // Generate salt and hash password
+    const salt = await bcrypt.genSalt(12);
+    this.password = await bcrypt.hash(this.password, salt);
     next();
   } catch (error) {
     next(error);
@@ -69,14 +46,21 @@ userSchema.pre('save', async function(next) {
 
 // Compare password method
 userSchema.methods.comparePassword = async function(candidatePassword) {
-  return await bcrypt.compare(candidatePassword, this.password);
+  try {
+    return await bcrypt.compare(candidatePassword, this.password);
+  } catch (error) {
+    console.error('Password comparison error:', error);
+    return false;
+  }
 };
 
 // Remove password from JSON output
 userSchema.methods.toJSON = function() {
-  const user = this.toObject();
-  delete user.password;
-  return user;
+  const userObject = this.toObject();
+  delete userObject.password;
+  return userObject;
 };
 
-export default mongoose.model('User', userSchema);
+const User = mongoose.model('User', userSchema);
+
+export default User;

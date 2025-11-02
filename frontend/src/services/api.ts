@@ -1,22 +1,15 @@
 ﻿import axios from 'axios';
 
-// Determine API URL based on environment
-const getApiUrl = () => {
-  // In production, use the full URL from environment variable
-  if (import.meta.env.PROD) {
-    return (import.meta.env.VITE_API_URL as string) || 'https://moodplate-backend.onrender.com/api';
-  }
-  // In development, use relative path (will be proxied by Vite)
-  return '/api';
-};
-
-const API_URL = getApiUrl();
+// Simple API configuration
+const API_URL = import.meta.env.PROD 
+  ? (import.meta.env.VITE_API_URL || 'https://moodplate-backend.onrender.com/api')
+  : '/api';
 
 console.log('🔗 API URL:', API_URL);
 
 const api = axios.create({
   baseURL: API_URL,
-  timeout: 30000, // 30 second timeout
+  timeout: 15000, // Reduced from 30000 to 15000ms (15 seconds)
   headers: {
     'Content-Type': 'application/json',
   },
@@ -25,19 +18,6 @@ const api = axios.create({
 // Request interceptor to add auth token
 api.interceptors.request.use((config) => {
   console.log(`🚀 ${config.method?.toUpperCase()} ${config.url}`);
-  
-  try {
-    const userString = localStorage.getItem('user');
-    if (userString) {
-      const user = JSON.parse(userString);
-      if (user && user.token) {
-        config.headers.Authorization = `Bearer ${user.token}`;
-        console.log('🔐 Added auth token to request');
-      }
-    }
-  } catch (error) {
-    console.error("❌ Could not parse user from localStorage:", error);
-  }
   return config;
 });
 
@@ -56,9 +36,7 @@ api.interceptors.response.use(
     });
     
     if (error.response?.status === 401) {
-      // Clear invalid token
       localStorage.removeItem('user');
-      console.log('🔓 Cleared invalid auth token');
     }
     
     return Promise.reject(error);

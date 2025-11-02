@@ -1,5 +1,4 @@
-﻿
-import express from 'express';
+﻿import express from 'express';
 import passport from 'passport';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
@@ -9,12 +8,10 @@ import { sendWelcomeEmail, sendLoginNotificationEmail, sendPasswordResetEmail } 
 
 const router = express.Router();
 
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://moodplate-frontend.onrender.com';
 
-// Use a function to get JWT_SECRET that runs when needed, not on import
 const getJwtSecret = () => {
   const secret = process.env.JWT_SECRET || 'moodplate_fallback_jwt_secret_2024_development_only';
-  console.log('🔐 getJwtSecret() called - JWT available:', !!process.env.JWT_SECRET);
   return secret;
 };
 
@@ -22,34 +19,38 @@ const getJwtSecret = () => {
 router.post('/register', async (req, res) => {
   try {
     const { fullName, email, phone, password } = req.body;
-    console.log('Registration attempt for:', email);
+    console.log('📝 Registration attempt for:', email);
 
     if (!fullName || !email || !password) {
       return res.status(400).json({ error: 'Full name, email, and password are required' });
     }
 
+    if (password.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters long' });
+    }
+
     // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
+      console.log('❌ User already exists:', email);
       return res.status(409).json({ error: 'User already exists with this email' });
     }
 
     // Create new user
     const newUser = new User({
-      fullName,
-      email,
-      phone: phone || '',
+      fullName: fullName.trim(),
+      email: email.toLowerCase().trim(),
+      phone: phone ? phone.trim() : '',
+      password: password
     });
 
-    // Password will be automatically hashed by the pre-save middleware
-    newUser.password = password;
-
     await newUser.save();
+    console.log('✅ User saved to database:', newUser.email);
 
-    // Generate JWT token - CALL THE FUNCTION HERE
+    // Generate JWT token
     const token = jwt.sign(
       { id: newUser._id, email: newUser.email },
-      getJwtSecret(),  // <-- Changed to function call
+      getJwtSecret(),
       { expiresIn: '30d' }
     );
 
@@ -60,25 +61,25 @@ router.post('/register', async (req, res) => {
       token: token
     };
 
-    console.log('Registration successful for:', email);
+    console.log('✅ Registration successful for:', email);
     
-    // Send welcome email
-    try {
-      await sendWelcomeEmail(email, fullName);
-      console.log('✅ Welcome email sent to:', email);
-    } catch (emailError) {
-      console.error('❌ Failed to send welcome email:', emailError);
-      // Don't fail the registration if email fails
-    }
+    // Send welcome email (non-blocking)
+    sendWelcomeEmail(email, fullName)
+      .then(() => console.log('✅ Welcome email sent to:', email))
+      .catch(emailError => console.error('❌ Failed to send welcome email:', emailError));
 
     res.status(201).json(userResponse);
     
   } catch (error) {
-    console.error('Registration route error:', error);
+    console.error('❌ Registration route error:', error);
     
     if (error.name === 'ValidationError') {
       const errors = Object.values(error.errors).map(err => err.message);
       return res.status(400).json({ error: errors.join(', ') });
+    }
+    
+    if (error.code === 11000) {
+      return res.status(409).json({ error: 'User already exists with this email' });
     }
     
     res.status(500).json({ error: 'Registration failed due to server error' });
@@ -88,32 +89,35 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log('Login attempt for:', email);
+    console.log('📝 Login attempt for:', email);
 
     if (!email || !password) {
       return res.status(400).json({ error: 'Email and password are required' });
     }
 
     // Find user by email
-    const user = await User.findOne({ email });
-    console.log('User found:', !!user);
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
+    console.log('👤 User found:', !!user);
 
     if (!user) {
+      console.log('❌ User not found:', email);
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
     // Check password using the model method
+    console.log('🔐 Comparing passwords...');
     const isPasswordValid = await user.comparePassword(password);
-    console.log('Password valid:', isPasswordValid);
+    console.log('✅ Password valid:', isPasswordValid);
 
     if (!isPasswordValid) {
+      console.log('❌ Invalid password for:', email);
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
-    // Generate JWT token - CALL THE FUNCTION HERE
+    // Generate JWT token
     const token = jwt.sign(
       { id: user._id, email: user.email },
-      getJwtSecret(),  // <-- Changed to function call
+      getJwtSecret(),
       { expiresIn: '30d' }
     );
 
@@ -124,21 +128,17 @@ router.post('/login', async (req, res) => {
       token: token
     };
 
-    console.log('Login successful for:', user.email);
+    console.log('✅ Login successful for:', user.email);
     
-    // Send login notification email
-    try {
-      await sendLoginNotificationEmail(user.email, user.fullName);
-      console.log('✅ Login notification email sent to:', user.email);
-    } catch (emailError) {
-      console.error('❌ Failed to send login notification email:', emailError);
-      // Don't fail the login if email fails
-    }
+    // Send login notification email (non-blocking)
+    sendLoginNotificationEmail(user.email, user.fullName)
+      .then(() => console.log('✅ Login notification email sent to:', user.email))
+      .catch(emailError => console.error('❌ Failed to send login notification email:', emailError));
 
     res.json(userResponse);
     
   } catch (error) {
-    console.error('Login route error:', error);
+    console.error('❌ Login route error:', error);
     res.status(500).json({ error: 'Internal server error during login' });
   }
 });
