@@ -74,6 +74,9 @@
     overflow-x: hidden;
     font-size: 1rem; /* This will now be 16px on desktop, 12px on mobile etc. */
     line-height: 1.4;
+    font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   }
 
   /* MOBILE-FIRST FONT SIZES - These will now scale based on the root HTML font-size */
