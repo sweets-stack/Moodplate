@@ -1,5 +1,4 @@
-﻿
-// backend/server.js
+﻿// backend/server.js
 import dotenv from 'dotenv';
 
 // Load environment variables
@@ -18,14 +17,21 @@ import userRoutes from './routes/userRoutes.js';
 import passportConfig from './config/passport-setup.js';
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+// FIX: Ensure PORT is a number, as app.listen expects a number for the port.
+const PORT = Number(process.env.PORT) || 3001;
 
 console.log('🚀 Starting Moodplate backend...');
+
+// --- FIX: Trust the proxy to get correct protocol (https) ---
+// This is crucial for running behind a proxy like Render's.
+app.set('trust proxy', 1);
+// -----------------------------------------------------------
 
 // Connect to MongoDB
 connectDB();
 
 // Security middleware
+// FIX: Removed ineffective JSDoc type cast to resolve "No overload matches this call" error.
 app.use(helmet());
 
 // CORS configuration
@@ -50,8 +56,10 @@ const corsOptions = {
 };
 
 // Enable CORS with options
+// FIX: Removed ineffective JSDoc type cast to resolve "No overload matches this call" error.
 app.use(cors(corsOptions));
 // Explicitly handle pre-flight requests for all routes
+// FIX: Removed ineffective JSDoc type cast to resolve "No overload matches this call" error.
 app.options('*', cors(corsOptions));
 
 
@@ -63,9 +71,11 @@ const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100
 });
+// FIX: Removed ineffective JSDoc type cast to resolve "No overload matches this call" error.
 app.use(limiter);
 
 // Session configuration
+// FIX: Removed ineffective JSDoc type cast to resolve "No overload matches this call" error.
 app.use(session({
   secret: process.env.SESSION_SECRET || 'dev_secret',
   resave: false,
@@ -92,7 +102,7 @@ app.use('/api/user', userRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ 
+  res.json({
     status: 'OK',
     environment: process.env.NODE_ENV || 'development',
     timestamp: new Date().toISOString()

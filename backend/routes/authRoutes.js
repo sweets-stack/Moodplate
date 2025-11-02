@@ -1,4 +1,5 @@
-﻿import express from 'express';
+﻿
+import express from 'express';
 import passport from 'passport';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
@@ -7,6 +8,8 @@ import ResetToken from '../models/ResetToken.js';
 import { sendWelcomeEmail, sendLoginNotificationEmail, sendPasswordResetEmail } from '../utils/emailService.js';
 
 const router = express.Router();
+
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
 // Use a function to get JWT_SECRET that runs when needed, not on import
 const getJwtSecret = () => {
@@ -45,7 +48,7 @@ router.post('/register', async (req, res) => {
 
     // Generate JWT token - CALL THE FUNCTION HERE
     const token = jwt.sign(
-      { id: newUser._id, email: newUser.email }, 
+      { id: newUser._id, email: newUser.email },
       getJwtSecret(),  // <-- Changed to function call
       { expiresIn: '30d' }
     );
@@ -109,7 +112,7 @@ router.post('/login', async (req, res) => {
 
     // Generate JWT token - CALL THE FUNCTION HERE
     const token = jwt.sign(
-      { id: user._id, email: user.email }, 
+      { id: user._id, email: user.email },
       getJwtSecret(),  // <-- Changed to function call
       { expiresIn: '30d' }
     );
@@ -143,21 +146,20 @@ router.post('/login', async (req, res) => {
 // --- OAUTH ROUTES ---
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-router.get('/google/callback', 
-  passport.authenticate('google', { 
-    failureRedirect: 'http://localhost:5173/login', 
-    session: true 
-  }), 
+router.get('/google/callback',
+  passport.authenticate('google', {
+    failureRedirect: `${FRONTEND_URL}/login`,
+    session: true
+  }),
   (req, res) => {
-    const token = jwt.sign({ id: req.user._id }, getJwtSecret(), { expiresIn: '30d' }); // <-- Fixed
-    const user = { 
-      id: req.user._id, 
-      fullName: req.user.fullName, 
-      email: req.user.email, 
-      token 
+    const token = jwt.sign({ id: req.user._id }, getJwtSecret(), { expiresIn: '30d' });
+    const user = {
+      id: req.user._id,
+      fullName: req.user.fullName,
+      email: req.user.email,
+      token
     };
     
-    // Send welcome email for OAuth users
     try {
       sendWelcomeEmail(req.user.email, req.user.fullName)
         .then(() => console.log('✅ Welcome email sent to OAuth user:', req.user.email))
@@ -166,27 +168,26 @@ router.get('/google/callback',
       console.error('❌ OAuth welcome email error:', emailError);
     }
     
-    res.redirect(`http://localhost:5173/auth/callback?user=${encodeURIComponent(JSON.stringify(user))}`);
+    res.redirect(`${FRONTEND_URL}/auth/callback?user=${encodeURIComponent(JSON.stringify(user))}`);
   }
 );
 
 router.get('/github', passport.authenticate('github', { scope: ['user:email'] }));
 
-router.get('/github/callback', 
-  passport.authenticate('github', { 
-    failureRedirect: 'http://localhost:5173/login', 
-    session: true 
-  }), 
+router.get('/github/callback',
+  passport.authenticate('github', {
+    failureRedirect: `${FRONTEND_URL}/login`,
+    session: true
+  }),
   (req, res) => {
-    const token = jwt.sign({ id: req.user._id }, getJwtSecret(), { expiresIn: '30d' }); // <-- Fixed
-    const user = { 
-      id: req.user._id, 
-      fullName: req.user.fullName, 
-      email: req.user.email, 
-      token 
+    const token = jwt.sign({ id: req.user._id }, getJwtSecret(), { expiresIn: '30d' });
+    const user = {
+      id: req.user._id,
+      fullName: req.user.fullName,
+      email: req.user.email,
+      token
     };
     
-    // Send welcome email for OAuth users
     try {
       sendWelcomeEmail(req.user.email, req.user.fullName)
         .then(() => console.log('✅ Welcome email sent to OAuth user:', req.user.email))
@@ -195,7 +196,7 @@ router.get('/github/callback',
       console.error('❌ OAuth welcome email error:', emailError);
     }
     
-    res.redirect(`http://localhost:5173/auth/callback?user=${encodeURIComponent(JSON.stringify(user))}`);
+    res.redirect(`${FRONTEND_URL}/auth/callback?user=${encodeURIComponent(JSON.stringify(user))}`);
   }
 );
 

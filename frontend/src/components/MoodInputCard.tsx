@@ -12,6 +12,7 @@ import {
 } from '@iconscout/react-unicons';
 import VoiceControl from './VoiceControl'; // Import the voice control
 import { FilterOptions, RecipeFilters } from '../types/recipe';
+import api from '../services/api'; // Import the api service
 
 interface MoodInputCardProps {
   onGenerateRecipe: (mood: string, filters: RecipeFilters) => void;
@@ -67,11 +68,9 @@ const MoodInputCard: React.FC<MoodInputCardProps> = ({ onGenerateRecipe, isLoadi
   useEffect(() => {
     const loadFilterOptions = async () => {
       try {
-        const response = await fetch('http://moodplate-backend.onrender.com/api/recipes/filters');
-        if (response.ok) {
-          const options = await response.json();
-          setFilterOptions(options);
-        }
+        // Use the configured api service instead of hardcoded fetch
+        const response = await api.get('/recipes/filters');
+        setFilterOptions(response.data);
       } catch (error) {
         console.error('Failed to load filter options:', error);
       }
