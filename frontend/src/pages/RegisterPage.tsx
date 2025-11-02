@@ -63,9 +63,9 @@ const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black text-gray-900 dark:text-gray-100 flex items-center justify-center lg:grid lg:grid-cols-2 pt-16 lg:pt-0">
-      {/* Left Side - Feature Showcase (Desktop only) */}
-      <div className="hidden lg:flex flex-col items-start justify-center p-8 xl:p-12 bg-gradient-to-br from-green-400 via-emerald-500 to-green-600 text-white">
+    <div className="min-h-screen bg-white dark:bg-black text-gray-900 dark:text-gray-100 flex lg:grid lg:grid-cols-2">
+      {/* Left Side - Feature Showcase (Desktop only) - Full Height */}
+      <div className="hidden lg:flex flex-col items-start justify-center p-8 xl:p-12 bg-gradient-to-br from-green-400 via-emerald-500 to-green-600 text-white min-h-screen">
         <motion.div 
           initial={{ opacity: 0, x: -30 }} 
           animate={{ opacity: 1, x: 0 }} 
@@ -92,7 +92,7 @@ const RegisterPage: React.FC = () => {
       </div>
 
       {/* Right Side - Registration Form */}
-      <div className="flex flex-col items-center justify-center w-full p-4 sm:p-6 lg:p-8">
+      <div className="flex flex-col items-center justify-center w-full p-4 sm:p-6 lg:p-8 min-h-screen">
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
