@@ -1,354 +1,370 @@
-﻿import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import {
-  UilClock,
-  UilBookmark,
-  UilShareAlt,
-  UilArrowDown,
-  UilCheck,
-  UilTrashAlt,
-  UilHeart
-} from '@iconscout/react-unicons';
-import { Recipe, SavedRecipe } from '../src/types/recipe';
-import { useAuth } from '../src/context/AuthContext';
+﻿import { useState, useEffect } from 'react';
+import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { ThemeProvider } from './context/ThemeContext';
+import { useAuth } from './context/AuthContext';
+import api from './services/api';
 
-interface RecipeCardProps {
-  recipe: Recipe | SavedRecipe;
-  onSave?: () => void;
-  onRegenerate?: () => void;
-  onDelete?: () => void;
-  isSaved: boolean;
-  compact?: boolean;
-}
+import { FaTwitter } from 'react-icons/fa';
+import { FiMail } from 'react-icons/fi';
 
-const RecipeCard: React.FC<RecipeCardProps> = ({
-  recipe,
-  onSave,
-  onRegenerate,
-  onDelete,
-  isSaved,
-  compact = false
-}) => {
-  const { isAuthenticated } = useAuth();
-  const [showIngredients, setShowIngredients] = useState(true);
-  const [showSteps, setShowSteps] = useState(true);
-  const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
-  const [imageError, setImageError] = useState(false);
-  const navigate = useNavigate();
+import AnimatedBackground from './components/AnimatedBackground';
+import Header from './components/Header';
+import HeroSection from './components/HeroSection';
+import RecipeCard from './components/RecipeCard';
+import MoodAnimation from './components/MoodAnimation';
+import Footer from './components/Footer';
 
-  const totalTime = (recipe.prepTimeMin || 0) + (recipe.cookTimeMin || 0);
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
+import AuthCallbackPage from './pages/AuthCallbackPage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import TermsOfServicePage from './pages/TermsOfServicePage';
 
-  const toggleStep = (index: number) => {
-    const newCompleted = new Set(completedSteps);
-    if (newCompleted.has(index)) {
-      newCompleted.delete(index);
-    } else {
-      newCompleted.add(index);
-    }
-    setCompletedSteps(newCompleted);
+import { Recipe, SavedRecipe, RecipeFilters } from './types/recipe';
+
+// Contact Section Component
+const ContactSection: React.FC = () => {
+  const handleEmailClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const email = 'sweetadetoye@gmail.com';
+    const subject = 'Project Inquiry from Moodplate';
+    const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}`;
+    window.location.href = mailtoLink;
+    setTimeout(() => {
+      if (document.hasFocus()) {
+        navigator.clipboard.writeText(email).then(() => {
+          alert(`Email client not found. Copied to clipboard: ${email}`);
+        });
+      }
+    }, 500);
   };
-
-  const getImageUrl = () => {
-    const defaultImg = `https://ui-avatars.com/api/?name=${encodeURIComponent(recipe.dishName)}&size=800&background=059669&color=fff&bold=true&format=svg`;
-    if (imageError || !recipe.imageUrl) {
-      return defaultImg;
-    }
-    return recipe.imageUrl;
-  };
-
-  const handleSaveClick = () => {
-    if (!isAuthenticated) {
-      navigate('/login', { state: { from: '/', message: 'Please log in to save recipes' } });
-      return;
-    }
-    if (onSave) {
-      onSave();
-    }
-  };
-
-  const ingredients = Array.isArray(recipe.ingredients) ? recipe.ingredients.map((ing: any) => ({
-    name: ing.name || '',
-    qty: ing.qty || '',
-    unit: ing.unit || '',
-    note: ing.note || ''
-  })) : [];
-
-  const steps = Array.isArray(recipe.steps) ? recipe.steps.filter(Boolean).map(String) : [];
-
-  if (compact) {
-    return (
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        whileHover={{ y: -4, scale: 1.02 }}
-        className="bg-white dark:bg-black rounded-xl sm:rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-200 dark:border-gray-800 group"
-        onClick={() => onRegenerate && onRegenerate()}
-      >
-        <div className="relative overflow-hidden h-32 sm:h-40 md:h-48">
-          <img
-            src={getImageUrl()}
-            onError={() => setImageError(true)}
-            alt={recipe.dishName}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-
-          {isSaved && (
-            <div className="absolute top-2 right-2 sm:top-3 sm:right-3">
-              <div className="bg-green-500 text-white px-2 py-1 sm:px-3 sm:py-1 rounded-full text-xs font-bold flex items-center gap-1">
-                <UilHeart size={12} className="sm:w-3 sm:h-3" />
-                <span className="text-xs">Saved</span>
-              </div>
-            </div>
-          )}
-
-          {onDelete && (
-            <motion.button
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete && onDelete();
-              }}
-              className="absolute top-2 left-2 sm:top-3 sm:left-3 p-1.5 sm:p-2 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lg"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-            >
-              <UilTrashAlt size={12} className="sm:w-4 sm:h-4" />
-            </motion.button>
-          )}
-
-          <div className="absolute bottom-2 left-2 right-2 sm:bottom-3 sm:left-3 sm:right-3">
-            <h3 className="font-black text-sm sm:text-base md:text-lg text-white mb-1 line-clamp-2">
-              {recipe.dishName}
-            </h3>
-            <p className="text-white/80 text-xs sm:text-sm line-clamp-1">{recipe.description}</p>
-          </div>
-        </div>
-
-        <div className="p-2 sm:p-3 md:p-4">
-          <div className="flex items-center justify-between text-xs sm:text-sm mb-2 sm:mb-3">
-            <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
-              <UilClock size={14} className="sm:w-4 sm:h-4" />
-              <span className="font-semibold text-xs sm:text-sm">{totalTime} min</span>
-            </div>
-            <div className="flex gap-1 flex-wrap justify-end">
-              {recipe.tags && recipe.tags.slice(0, 2).map((tag, index) => (
-                <span
-                  key={index}
-                  className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-green-500/10 text-green-600 dark:text-green-400 text-xs font-bold rounded-full"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-      </motion.div>
-    );
-  }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-      className="max-w-4xl lg:max-w-5xl mx-auto px-3 sm:px-4"
-    >
-      <div className="bg-white dark:bg-black rounded-2xl lg:rounded-3xl overflow-hidden shadow-xl lg:shadow-2xl border border-gray-200 dark:border-gray-800">
-        {/* Hero Image Section */}
-        <div className="relative h-48 sm:h-64 md:h-80 lg:h-96 overflow-hidden group">
-          <motion.img
-            src={getImageUrl()}
-            onError={() => setImageError(true)}
-            alt={recipe.dishName}
-            className="w-full h-full object-cover"
-            whileHover={{ scale: 1.03 }}
-            transition={{ duration: 0.5 }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-          
-          {/* Tags */}
-          <div className="absolute top-3 sm:top-4 lg:top-6 right-3 sm:right-4 lg:right-6 flex flex-wrap gap-1 sm:gap-2 justify-end max-w-xs sm:max-w-md">
-            {recipe.tags && recipe.tags.slice(0, 3).map((tag, index) => (
-              <motion.span
-                key={index}
-                className="px-2 py-1 sm:px-3 sm:py-1.5 lg:px-4 lg:py-2 bg-white/20 dark:bg-black/40 backdrop-blur-lg text-white text-xs sm:text-sm font-bold rounded-full border border-white/30"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3 + index * 0.1 }}
-                whileHover={{ scale: 1.05 }}
-              >
-                {tag}
-              </motion.span>
-            ))}
-          </div>
-          
-          {/* Title and Description */}
-          <div className="absolute bottom-4 sm:bottom-6 lg:bottom-8 left-4 sm:left-6 lg:left-8 right-4 sm:right-6 lg:right-8">
-            <motion.h2
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white mb-2 sm:mb-3 drop-shadow-2xl line-clamp-2"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              {recipe.dishName}
-            </motion.h2>
-            <motion.p
-              className="text-sm sm:text-base lg:text-lg text-white/90 max-w-3xl drop-shadow-lg line-clamp-2 sm:line-clamp-3"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-            >
-              {recipe.description}
-            </motion.p>
-          </div>
-        </div>
-
-        {/* Stats Section */}
-        <div className="p-4 sm:p-6 lg:p-8 border-b border-gray-200 dark:border-gray-800">
-          <div className="flex flex-wrap gap-4 sm:gap-6 justify-center">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <UilClock size={20} className="sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-green-500" />
-              <div>
-                <p className="text-xs font-bold text-gray-500 uppercase">Total Time</p>
-                <p className="text-lg sm:text-xl lg:text-2xl font-black">{totalTime} min</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 sm:gap-3">
-              <span className="text-xl sm:text-2xl lg:text-3xl">👥</span>
-              <div>
-                <p className="text-xs font-bold text-gray-500 uppercase">Servings</p>
-                <p className="text-lg sm:text-xl lg:text-2xl font-black">{recipe.servings}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 sm:gap-3">
-              <span className="text-xl sm:text-2xl lg:text-3xl">⚡</span>
-              <div>
-                <p className="text-xs font-bold text-gray-500 uppercase">Difficulty</p>
-                <p className="text-lg sm:text-xl lg:text-2xl font-black capitalize">{recipe.difficulty}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Ingredients and Instructions */}
-        <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 p-4 sm:p-6 lg:p-8">
-          {/* Ingredients */}
-          <div>
-            <button
-              onClick={() => setShowIngredients(!showIngredients)}
-              className="flex items-center justify-between w-full text-left mb-4 sm:mb-6"
-            >
-              <h3 className="text-xl sm:text-2xl lg:text-3xl font-black">Ingredients ({ingredients.length})</h3>
-              <UilArrowDown 
-                size={20} 
-                className="sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-green-500 transition-transform duration-300"
-                style={{ transform: showIngredients ? 'rotate(180deg)' : 'rotate(0deg)' }}
-              />
-            </button>
-            <AnimatePresence>
-              {showIngredients && (
-                <motion.ul
-                  className="space-y-2 sm:space-y-3"
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                >
-                  {ingredients.map((ing, index) => (
-                    <li key={index} className="flex items-start gap-2 sm:gap-3 p-2 sm:p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg text-sm sm:text-base">
-                      <span className="text-green-500 font-bold mt-0.5">•</span>
-                      <span className="font-medium">{ing.qty} {ing.unit} {ing.name}</span>
-                    </li>
-                  ))}
-                </motion.ul>
-              )}
-            </AnimatePresence>
-          </div>
-
-          {/* Instructions */}
-          <div>
-            <button
-              onClick={() => setShowSteps(!showSteps)}
-              className="flex items-center justify-between w-full text-left mb-4 sm:mb-6"
-            >
-              <h3 className="text-xl sm:text-2xl lg:text-3xl font-black">Instructions ({steps.length})</h3>
-              <UilArrowDown 
-                size={20} 
-                className="sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-green-500 transition-transform duration-300"
-                style={{ transform: showSteps ? 'rotate(180deg)' : 'rotate(0deg)' }}
-              />
-            </button>
-            <AnimatePresence>
-              {showSteps && (
-                <motion.ol 
-                  className="space-y-3 sm:space-y-4" 
-                  initial={{ opacity: 0 }} 
-                  animate={{ opacity: 1 }}
-                >
-                  {steps.map((step, index) => (
-                    <li key={index} className="flex gap-3 sm:gap-4 cursor-pointer" onClick={() => toggleStep(index)}>
-                      <div className={`flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-lg sm:rounded-xl flex items-center justify-center text-white font-black text-sm sm:text-base lg:text-lg ${
-                        completedSteps.has(index) ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-700'
-                      }`}>
-                        {completedSteps.has(index) ? <UilCheck size={16} className="sm:w-5 sm:h-5" /> : index + 1}
-                      </div>
-                      <p className="pt-1 sm:pt-2 text-sm sm:text-base flex-1">{step}</p>
-                    </li>
-                  ))}
-                </motion.ol>
-              )}
-            </AnimatePresence>
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="p-4 sm:p-6 lg:p-8 border-t border-gray-200 dark:border-gray-800">
-          <div className="flex flex-wrap gap-3 sm:gap-4 justify-center">
-            <motion.button
-              onClick={() => onRegenerate && onRegenerate()}
-              className="flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 lg:px-6 lg:py-3 bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white font-bold rounded-lg hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors text-sm sm:text-base"
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-            >
-              <UilShareAlt size={16} className="sm:w-5 sm:h-5" />
-              Regenerate
+    <section id="contact" className="py-12 md:py-20 bg-gray-50 dark:bg-black">
+      <div className="container mx-auto px-4 text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, once: true }}
+        >
+          <h2 className="text-2xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white mb-4">
+            Let's Build Something Amazing
+          </h2>
+          <p className="text-base md:text-xl text-gray-600 dark:text-gray-400 mb-8 md:mb-12 max-w-2xl mx-auto">
+            Interested in collaborating or have a project in mind? Let's connect.
+          </p>
+          <div className="flex justify-center gap-6 mb-8 md:mb-12">
+            <motion.a href="https://twitter.com/sweetsstack" target="_blank" rel="noopener noreferrer" whileHover={{ y: -5, scale: 1.1 }}>
+              <FaTwitter className="w-6 h-6 md:w-8 md:h-8 text-gray-500 dark:text-gray-400 hover:text-green-500" />
+            </motion.a>
+            <motion.button onClick={handleEmailClick} whileHover={{ y: -5, scale: 1.1 }} aria-label="Send an email">
+              <FiMail className="w-6 h-6 md:w-8 md:h-8 text-gray-500 dark:text-gray-400 hover:text-green-500" />
             </motion.button>
-            
-            {onSave && !isSaved && (
-              <motion.button
-                onClick={handleSaveClick}
-                className="flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 lg:px-6 lg:py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition-colors text-sm sm:text-base"
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-              >
-                <UilBookmark size={16} className="sm:w-5 sm:h-5" />
-                Save Recipe
-              </motion.button>
-            )}
-            
-            {isSaved && (
-              <div className="flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 lg:px-6 lg:py-3 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 font-bold rounded-lg text-sm sm:text-base">
-                <UilCheck size={16} className="sm:w-5 sm:h-5" />
-                Saved
-              </div>
-            )}
-            
-            {onDelete && (
-              <motion.button
-                onClick={onDelete}
-                className="flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 lg:px-6 lg:py-3 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-colors text-sm sm:text-base"
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-              >
-                <UilTrashAlt size={16} className="sm:w-5 sm:h-5" />
-                Delete
-              </motion.button>
-            )}
           </div>
-        </div>
+          <div className="bg-white dark:bg-green-950 rounded-xl md:rounded-2xl p-6 md:p-8 max-w-2xl mx-auto border border-gray-200 dark:border-gray-800 shadow-lg md:shadow-xl">
+            <h3 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white mb-4">
+              Need a Website Like This?
+            </h3>
+            <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 mb-6">
+              This project was developed by <span className="font-bold text-green-500">SweetStack</span>. If you're looking for a professional, high-performance website, feel free to reach out.
+            </p>
+            <motion.button onClick={handleEmailClick} className="inline-block bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold py-2 px-6 md:py-3 md:px-8 rounded-lg hover:shadow-lg transition-all duration-300 text-sm md:text-base" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              Contact SweetStack
+            </motion.button>
+          </div>
+        </motion.div>
       </div>
-    </motion.div>
+    </section>
   );
 };
 
-export default RecipeCard;
+// --- MAIN PAGE LOGIC ---
+function MainPage() {
+  const [currentRecipe, setCurrentRecipe] = useState<Recipe | SavedRecipe | null>(null);
+  const [savedRecipes, setSavedRecipes] = useState<SavedRecipe[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { user, isAuthenticated } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (location.state?.scrollTo) {
+      const element = document.getElementById(location.state.scrollTo);
+      if (element) {
+        window.scrollTo({ top: element.offsetTop - 80, behavior: 'smooth' });
+      }
+    }
+  }, [location]);
+
+  useEffect(() => {
+    const fetchSavedRecipes = async () => {
+      if (user && isAuthenticated) {
+        setIsLoading(true);
+        try {
+          console.log('📥 Fetching saved recipes for user:', user.id);
+          const response = await api.get('/user/recipes');
+          console.log('✅ Saved recipes response:', response.data);
+          setSavedRecipes(response.data.savedRecipes || []);
+        } catch (err: any) {
+          console.error('❌ Failed to load saved recipes:', err);
+          if (err.response?.status === 401) {
+            setError("Please log in again to view saved recipes.");
+            localStorage.removeItem('user');
+          } else {
+            setError("Could not load your saved recipes.");
+          }
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        setSavedRecipes([]);
+      }
+    };
+    fetchSavedRecipes();
+  }, [user, isAuthenticated]);
+
+  const handleGenerateRecipe = async (mood: string, filters: RecipeFilters) => {
+    setIsLoading(true);
+    setError(null);
+    setCurrentRecipe(null);
+    try {
+      const response = await api.post('/recipes/generate', { mood, ...filters });
+      setCurrentRecipe(response.data);
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Failed to generate a recipe.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleViewRecipe = (recipe: SavedRecipe) => {
+    setCurrentRecipe(recipe);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleSaveRecipe = async () => {
+    if (!user || !isAuthenticated) {
+      navigate('/login', { state: { from: '/', message: 'Please log in to save recipes' } });
+      return;
+    }
+    
+    if (!currentRecipe) {
+      console.log('❌ No current recipe to save');
+      return;
+    }
+
+    try {
+      console.log('💾 Saving recipe:', currentRecipe.dishName);
+      
+      // Generate a unique ID for the recipe if it doesn't have one
+      const recipeId = (currentRecipe as any).id || (currentRecipe as any)._id || Date.now().toString();
+      
+      await api.post('/user/recipes', {
+        recipeId: recipeId,
+        recipeData: currentRecipe
+      });
+
+      console.log('✅ Recipe saved successfully');
+      
+      // Update saved recipes list
+      const newSavedRecipe: SavedRecipe = {
+        ...currentRecipe,
+        id: recipeId,
+        savedAt: new Date().toISOString()
+      };
+      
+      setSavedRecipes(prev => [...prev, newSavedRecipe]);
+      
+      // Show success message
+      alert('Recipe saved successfully!');
+      
+    } catch (err: any) {
+      console.error('❌ Failed to save recipe:', err);
+      
+      if (err.response?.status === 409) {
+        setError('This recipe is already saved!');
+      } else if (err.response?.status === 401) {
+        setError('Please log in again to save recipes.');
+        // Clear invalid token
+        localStorage.removeItem('user');
+        window.location.reload();
+      } else {
+        setError('Failed to save recipe. Please try again.');
+      }
+    }
+  };
+
+  const handleDeleteRecipe = async (recipeId: string) => {
+    if (!user || !isAuthenticated) return;
+    
+    try {
+      console.log('🗑️ Deleting recipe:', recipeId);
+      await api.delete(`/user/recipes/${recipeId}`);
+      console.log('✅ Recipe deleted successfully');
+      
+      // Update saved recipes list
+      setSavedRecipes(prev => prev.filter(recipe => recipe.id !== recipeId));
+      
+      // If the current recipe is the one being deleted, clear it
+      if (currentRecipe && 'id' in currentRecipe && (currentRecipe as SavedRecipe).id === recipeId) {
+        setCurrentRecipe(null);
+      }
+      
+    } catch (err: any) {
+      console.error('❌ Failed to delete recipe:', err);
+      if (err.response?.status === 401) {
+        setError('Please log in again to delete recipes.');
+        localStorage.removeItem('user');
+        window.location.reload();
+      } else {
+        setError('Failed to delete recipe. Please try again.');
+      }
+    }
+  };
+
+  // Helper function to check if recipe is saved
+  const isRecipeSaved = (recipe: Recipe | SavedRecipe | null): boolean => {
+    if (!recipe) return false;
+    
+    const recipeId = (recipe as any).id || (recipe as any)._id;
+    const recipeName = recipe.dishName;
+    
+    return savedRecipes.some(savedRecipe => 
+      savedRecipe.id === recipeId || 
+      savedRecipe.dishName === recipeName
+    );
+  };
+
+  // Helper function to find saved recipe for deletion
+  const getRecipeForDeletion = (recipe: Recipe | SavedRecipe | null): SavedRecipe | null => {
+    if (!recipe) return null;
+    
+    const recipeId = (recipe as any).id || (recipe as any)._id;
+    const recipeName = recipe.dishName;
+    
+    return savedRecipes.find(savedRecipe => 
+      savedRecipe.id === recipeId || 
+      savedRecipe.dishName === recipeName
+    ) || null;
+  };
+
+  return (
+    <div className="relative z-10">
+      <section id="hero" className="pt-16 md:pt-20">
+        {!currentRecipe && (
+          <HeroSection
+            onGenerateRecipe={handleGenerateRecipe}
+            isLoading={isLoading}
+          />
+        )}
+      </section>
+
+      {isLoading && <MoodAnimation />}
+
+      {error && (
+        <div className="text-center my-4 p-3 md:p-4 bg-red-500/20 text-red-500 rounded-md max-w-lg mx-auto text-sm md:text-base">
+          {error}
+          <button onClick={() => setError(null)} className="ml-4 font-bold">X</button>
+        </div>
+      )}
+
+      {currentRecipe && !isLoading && (
+        <div className="container mx-auto px-3 md:px-4 py-6 md:py-8">
+          <RecipeCard
+            recipe={currentRecipe}
+            onSave={handleSaveRecipe}
+            onRegenerate={() => {
+              setCurrentRecipe(null);
+              setError(null);
+            }}
+            onDelete={() => {
+              const recipeToDelete = getRecipeForDeletion(currentRecipe);
+              if (recipeToDelete) {
+                handleDeleteRecipe(recipeToDelete.id);
+              }
+            }}
+            isSaved={isRecipeSaved(currentRecipe)}
+          />
+        </div>
+      )}
+
+      <section id="saved-recipes" className="py-8 md:py-12">
+        {user && isAuthenticated && savedRecipes.length > 0 && !currentRecipe && (
+          <div className="container mx-auto px-3 md:px-4">
+            <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8 md:mb-12">
+              <h2 className="text-2xl md:text-4xl font-black text-gray-900 dark:text-white mb-4">
+                Your Saved Recipes ({savedRecipes.length})
+              </h2>
+            </motion.div>
+            <div className="grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {savedRecipes.map(recipe => (
+                <RecipeCard
+                  key={recipe.id}
+                  recipe={recipe}
+                  isSaved={true}
+                  onRegenerate={() => handleViewRecipe(recipe)}
+                  onDelete={() => handleDeleteRecipe(recipe.id)}
+                  compact={true}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+        
+        {user && isAuthenticated && savedRecipes.length === 0 && !currentRecipe && (
+          <div className="container mx-auto px-3 md:px-4 text-center">
+            <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}>
+              <h2 className="text-2xl md:text-4xl font-black text-gray-900 dark:text-white mb-4">
+                Your Saved Recipes
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400 text-lg">
+                Save recipes you love to find them here later!
+              </p>
+            </motion.div>
+          </div>
+        )}
+      </section>
+
+      <section id="about" className="py-12 md:py-20 bg-green-100 dark:bg-green-950">
+        <div className="container mx-auto px-4 text-center">
+            <h2 className="text-3xl md:text-5xl font-black mb-4">About Moodplate</h2>
+            <p className="text-base md:text-xl max-w-3xl mx-auto text-gray-600 dark:text-gray-400">
+                Moodplate creates personalized recipes based on your current mood, weather, and time of day. Find the perfect dish to match your vibe.
+            </p>
+        </div>
+      </section>
+
+      <ContactSection />
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <ThemeProvider>
+      <div className="min-h-screen relative flex flex-col overflow-hidden">
+        <AnimatedBackground />
+        <Header />
+        <main className="flex-grow">
+          <Routes>
+            <Route path="/" element={<MainPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+            <Route path="/auth/callback" element={<AuthCallbackPage />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+            <Route path="/terms-of-service" element={<TermsOfServicePage />} />
+          </Routes>
+        </main>
+        <Footer />
+      </div>
+    </ThemeProvider>
+  );
+}
+
+export default App;

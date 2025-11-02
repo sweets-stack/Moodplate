@@ -14,7 +14,7 @@ import { Recipe, SavedRecipe } from '../types/recipe';
 import { useAuth } from '../context/AuthContext';
 
 interface RecipeCardProps {
-  recipe: Recipe | SavedRecipe;
+  recipe: Recipe | SavedRecipe | null;
   onSave?: () => void;
   onRegenerate?: () => void;
   onDelete?: () => void;
@@ -37,6 +37,17 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
   const [imageError, setImageError] = useState(false);
   const navigate = useNavigate();
 
+  // Add null checks for recipe
+  if (!recipe) {
+    return (
+      <div className="max-w-4xl lg:max-w-5xl mx-auto px-3 sm:px-4">
+        <div className="bg-white dark:bg-black rounded-2xl lg:rounded-3xl overflow-hidden shadow-xl lg:shadow-2xl border border-gray-200 dark:border-gray-800 p-8 text-center">
+          <p className="text-gray-500 dark:text-gray-400 text-lg">No recipe data available</p>
+        </div>
+      </div>
+    );
+  }
+
   const totalTime = (recipe.prepTimeMin || 0) + (recipe.cookTimeMin || 0);
 
   const toggleStep = (index: number) => {
@@ -50,7 +61,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
   };
 
   const getImageUrl = () => {
-    const defaultImg = `https://ui-avatars.com/api/?name=${encodeURIComponent(recipe.dishName)}&size=800&background=059669&color=fff&bold=true&format=svg`;
+    const defaultImg = `https://ui-avatars.com/api/?name=${encodeURIComponent(recipe.dishName || 'Recipe')}&size=800&background=059669&color=fff&bold=true&format=svg`;
     if (imageError || !recipe.imageUrl) {
       return defaultImg;
     }
@@ -89,7 +100,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
           <img
             src={getImageUrl()}
             onError={() => setImageError(true)}
-            alt={recipe.dishName}
+            alt={recipe.dishName || 'Recipe'}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
@@ -119,9 +130,9 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
 
           <div className="absolute bottom-2 left-2 right-2 sm:bottom-3 sm:left-3 sm:right-3">
             <h3 className="font-black text-sm sm:text-base md:text-lg text-white mb-1 line-clamp-2">
-              {recipe.dishName}
+              {recipe.dishName || 'Untitled Recipe'}
             </h3>
-            <p className="text-white/80 text-xs sm:text-sm line-clamp-1">{recipe.description}</p>
+            <p className="text-white/80 text-xs sm:text-sm line-clamp-1">{recipe.description || ''}</p>
           </div>
         </div>
 
@@ -160,7 +171,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
           <motion.img
             src={getImageUrl()}
             onError={() => setImageError(true)}
-            alt={recipe.dishName}
+            alt={recipe.dishName || 'Recipe'}
             className="w-full h-full object-cover"
             whileHover={{ scale: 1.03 }}
             transition={{ duration: 0.5 }}
@@ -191,7 +202,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
             >
-              {recipe.dishName}
+              {recipe.dishName || 'Untitled Recipe'}
             </motion.h2>
             <motion.p
               className="text-sm sm:text-base lg:text-lg text-white/90 max-w-3xl drop-shadow-lg line-clamp-2 sm:line-clamp-3"
@@ -199,7 +210,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
             >
-              {recipe.description}
+              {recipe.description || ''}
             </motion.p>
           </div>
         </div>
@@ -218,14 +229,14 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
               <span className="text-xl sm:text-2xl lg:text-3xl">👥</span>
               <div>
                 <p className="text-xs font-bold text-gray-500 uppercase">Servings</p>
-                <p className="text-lg sm:text-xl lg:text-2xl font-black">{recipe.servings}</p>
+                <p className="text-lg sm:text-xl lg:text-2xl font-black">{recipe.servings || 'N/A'}</p>
               </div>
             </div>
             <div className="flex items-center gap-2 sm:gap-3">
               <span className="text-xl sm:text-2xl lg:text-3xl">⚡</span>
               <div>
                 <p className="text-xs font-bold text-gray-500 uppercase">Difficulty</p>
-                <p className="text-lg sm:text-xl lg:text-2xl font-black capitalize">{recipe.difficulty}</p>
+                <p className="text-lg sm:text-xl lg:text-2xl font-black capitalize">{recipe.difficulty || 'N/A'}</p>
               </div>
             </div>
           </div>
