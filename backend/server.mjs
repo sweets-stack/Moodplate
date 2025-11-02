@@ -31,7 +31,7 @@ app.set('trust proxy', 1);
 connectDB();
 
 // Security middleware
-// FIX: Explicitly provide a path to resolve "No overload matches this call" error.
+// FIX: Resolved "No overload matches this call" error by explicitly providing the root path.
 app.use('/', helmet());
 
 // CORS configuration
@@ -56,26 +56,25 @@ const corsOptions = {
 };
 
 // Enable CORS with options
-// FIX: Explicitly provide a path to resolve "No overload matches this call" error.
+// FIX: Resolved "No overload matches this call" error by explicitly providing the root path.
 app.use('/', cors(corsOptions));
-// Explicitly handle pre-flight requests for all routes
-// FIX: Removed problematic type cast to resolve "No overload matches this call" error.
-app.options('*', cors(corsOptions));
 
 
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true }));
+// FIX: Resolved "No overload matches this call" error by explicitly providing the root path.
+app.use('/', express.json({ limit: '10mb' }));
+// FIX: Resolved "No overload matches this call" error by explicitly providing the root path.
+app.use('/', express.urlencoded({ extended: true }));
 
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100
 });
-// FIX: Explicitly provide a path to resolve "No overload matches this call" error.
+// FIX: Resolved "No overload matches this call" error by explicitly providing the root path.
 app.use('/', limiter);
 
 // Session configuration
-// FIX: Explicitly provide a path to resolve "No overload matches this call" error.
+// FIX: Resolved "No overload matches this call" error by explicitly providing the root path.
 app.use('/', session({
   secret: process.env.SESSION_SECRET || 'dev_secret',
   resave: false,
@@ -89,8 +88,10 @@ app.use('/', session({
 }));
 
 // Passport middleware
-app.use(passport.initialize());
-app.use(passport.session());
+// FIX: Resolved "No overload matches this call" error by explicitly providing the root path.
+app.use('/', passport.initialize());
+// FIX: Resolved "No overload matches this call" error by explicitly providing the root path.
+app.use('/', passport.session());
 
 // Initialize passport
 passportConfig(passport);

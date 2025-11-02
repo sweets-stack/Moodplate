@@ -4,12 +4,11 @@ import recipeLoader from '../utils/csvLoader.mjs';
 const router = express.Router();
 
 // Ensure recipes are loaded before handling requests
-// Top-level await is supported in ES modules
 await recipeLoader.loadRecipes();
 
 router.post('/generate', async (req, res) => {
   try {
-    const { mood, ...filters } = req.body;
+    const { mood, weather, timeOfDay, cuisineType, mealType, difficulty } = req.body;
 
     if (!mood || typeof mood !== 'string' || mood.trim().length === 0) {
       return res.status(400).json({
@@ -18,26 +17,26 @@ router.post('/generate', async (req, res) => {
       });
     }
 
-    // Use the optimized findRecipesByMood function with all filters
+    // Pass all filters to the find function
+    const filters = { cuisineType, mealType, difficulty, weather, timeOfDay };
     let matchingRecipes = recipeLoader.findRecipesByMood(mood.trim(), filters);
 
-    // If no recipes match the specific filters, broaden the search
+    // If no specific matches, broaden the search to just the mood
     if (matchingRecipes.length === 0) {
-      // Fallback 1: Find recipes matching only the mood
+      console.log('No recipes match all filters. Trying mood-only search...');
       matchingRecipes = recipeLoader.findRecipesByMood(mood.trim(), {});
       
-      // Fallback 2: If still no matches, just grab any random recipe
+      // If still no matches, return a 404 or a random recipe as a last resort
       if (matchingRecipes.length === 0) {
+        console.log('No recipes found for mood. Returning any random recipe.');
         const anyRecipe = recipeLoader.getRandomRecipe(recipeLoader.recipes);
         if (anyRecipe) {
           return res.json(anyRecipe);
         }
-        // This case should be rare if the CSV is loaded
-        return res.status(404).json({ error: 'No recipes found in the dataset.' });
+        return res.status(404).json({ error: 'No recipes found for that mood or in the dataset.' });
       }
     }
 
-    // Get a random recipe from the filtered list
     const recipe = recipeLoader.getRandomRecipe(matchingRecipes);
     res.json(recipe);
     

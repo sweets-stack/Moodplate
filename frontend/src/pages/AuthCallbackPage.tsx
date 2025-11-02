@@ -16,9 +16,10 @@ const AuthCallbackPage: React.FC = () => {
             try {
                 const userData: User = JSON.parse(decodeURIComponent(userParam));
                 if (userData && userData.token) {
+                    // This is the key fix: login() updates the context
                     login(userData);
-                    // Force a page reload to ensure context updates
-                    window.location.href = '/';
+                    // Then, navigate using the router to preserve state
+                    navigate('/', { replace: true });
                 } else {
                     // Invalid user data
                     navigate('/login', { replace: true });
