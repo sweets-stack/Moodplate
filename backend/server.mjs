@@ -1,7 +1,6 @@
-﻿// backend/server.js
-import dotenv from 'dotenv';
+﻿import dotenv from 'dotenv';
 
-// Load environment variables
+// Load environment variables FIRST
 dotenv.config();
 
 import express from 'express';
@@ -17,52 +16,31 @@ import userRoutes from './routes/userRoutes.js';
 import passportConfig from './config/passport-setup.js';
 
 const app = express();
-// FIX: Ensure PORT is a number, as app.listen expects a number for the port.
 const PORT = Number(process.env.PORT) || 3001;
 
 console.log('🚀 Starting Moodplate backend...');
+console.log('📊 Environment:', process.env.NODE_ENV);
+console.log('🔐 JWT Secret available:', !!process.env.JWT_SECRET);
 
-// --- FIX: Trust the proxy to get correct protocol (https) ---
-// This is crucial for running behind a proxy like Render's.
+// Trust proxy for Render
 app.set('trust proxy', 1);
-// -----------------------------------------------------------
 
 // Connect to MongoDB
 connectDB();
 
-// Security middleware
-// FIX: Removed explicit path '/' to resolve "No overload matches this call" TypeScript error.
-app.use(helmet());
-
-// CORS configuration
-const allowedOrigins = [
-  'http://localhost:5173',
-  'https://moodplate-frontend.onrender.com'
-];
-
-const corsOptions = {
-  origin: (origin, callback) => {
-    // allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-      return callback(new Error(msg), false);
-    }
-    return callback(null, true);
-  },
+// CORS configuration - ALLOW ALL ORIGINS FOR NOW
+app.use(cors({
+  origin: true, // Allow all origins in production
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-};
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+}));
 
-// Enable CORS with options
-// FIX: To maintain consistency and prevent potential type errors, removed explicit root path.
-app.use(cors(corsOptions));
+// Security middleware
+app.use(helmet());
 
-
-// FIX: Removed explicit path '/' to resolve "No overload matches this call" TypeScript error.
+// Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
-// FIX: Removed explicit path '/' to resolve "No overload matches this call" TypeScript error.
 app.use(express.urlencoded({ extended: true }));
 
 // Rate limiting
@@ -70,33 +48,29 @@ const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100
 });
-// FIX: Removed explicit path '/' to resolve "No overload matches this call" TypeScript error.
 app.use(limiter);
 
 // Session configuration
-// FIX: Removed explicit path '/' to resolve "No overload matches this call" TypeScript error.
 app.use(session({
   secret: process.env.SESSION_SECRET || 'dev_secret',
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+    secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // 'none' for cross-site cookies, requires secure=true
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     maxAge: 24 * 60 * 60 * 1000
   }
 }));
 
 // Passport middleware
-// FIX: To maintain consistency and prevent potential type errors, removed explicit root path.
 app.use(passport.initialize());
-// FIX: To maintain consistency and prevent potential type errors, removed explicit root path.
 app.use(passport.session());
 
 // Initialize passport
 passportConfig(passport);
 
-// Routes
+// API Routes - ADD /api PREFIX
 app.use('/api/recipes', recipeRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
@@ -106,25 +80,48 @@ app.get('/api/health', (req, res) => {
   res.json({
     status: 'OK',
     environment: process.env.NODE_ENV || 'development',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    message: 'Moodplate Backend is running!'
+  });
+});
+
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Moodplate Backend Server',
+    version: '1.0.0',
+    endpoints: {
+      health: '/api/health',
+      recipes: '/api/recipes',
+      auth: '/api/auth',
+      user: '/api/user'
+    }
   });
 });
 
 // 404 handler
 app.use('*', (req, res) => {
-  res.status(404).json({ error: 'Route not found' });
+  res.status(404).json({ 
+    error: 'Route not found',
+    path: req.originalUrl,
+    method: req.method
+  });
 });
 
 // Error handling
 app.use((error, req, res, next) => {
   console.error('Server error:', error);
-  res.status(500).json({ error: 'Internal server error' });
+  res.status(500).json({ 
+    error: 'Internal server error',
+    message: error.message 
+  });
 });
 
 // Start server
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Moodplate backend running on port ${PORT}`);
-  console.log(`📍 Health check: http://localhost:${PORT}/api/health`);
+  console.log(`📍 Health: http://localhost:${PORT}/api/health`);
+  console.log(`📍 Frontend: ${process.env.FRONTEND_URL || 'http://localhost:5173'}`);
 });
 
 export default app;
