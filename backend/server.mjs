@@ -1,4 +1,5 @@
-﻿// backend/server.js
+﻿
+// backend/server.js
 import dotenv from 'dotenv';
 
 // Load environment variables
@@ -28,13 +29,31 @@ connectDB();
 app.use(helmet());
 
 // CORS configuration
-app.use(cors({
-  origin: [
+const allowedOrigins = [
   'http://localhost:5173',
   'https://moodplate-frontend.onrender.com'
-],
+];
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    // allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
   credentials: true,
-}));
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
+// Enable CORS with options
+app.use(cors(corsOptions));
+// Explicitly handle pre-flight requests for all routes
+app.options('*', cors(corsOptions));
+
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
@@ -52,7 +71,9 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: false,
+    secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+    httpOnly: true,
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // 'none' for cross-site cookies, requires secure=true
     maxAge: 24 * 60 * 60 * 1000
   }
 }));
