@@ -1,6 +1,6 @@
 ﻿import axios from 'axios';
 
-const API_URL = 'http://https://moodplate-backend.onrender.com/api';
+const API_URL = 'http://localhost:3001/api';
 
 const api = axios.create({
   baseURL: API_URL,
