@@ -9,7 +9,7 @@ console.log('🔗 API URL:', API_URL);
 
 const api = axios.create({
   baseURL: API_URL,
-  timeout: 15000, // Reduced from 30000 to 15000ms (15 seconds)
+  timeout: 15000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -18,6 +18,23 @@ const api = axios.create({
 // Request interceptor to add auth token
 api.interceptors.request.use((config) => {
   console.log(`🚀 ${config.method?.toUpperCase()} ${config.url}`);
+  
+  try {
+    const userString = localStorage.getItem('user');
+    if (userString) {
+      const user = JSON.parse(userString);
+      if (user && user.token) {
+        config.headers.Authorization = `Bearer ${user.token}`;
+        console.log('🔐 Added auth token to request');
+      } else {
+        console.log('❌ No valid token found in user data');
+      }
+    } else {
+      console.log('❌ No user data found in localStorage');
+    }
+  } catch (error) {
+    console.error("❌ Could not parse user from localStorage:", error);
+  }
   return config;
 });
 
@@ -36,7 +53,10 @@ api.interceptors.response.use(
     });
     
     if (error.response?.status === 401) {
+      console.log('🔐 Unauthorized, clearing user data...');
       localStorage.removeItem('user');
+      // You might want to trigger a logout here
+      window.dispatchEvent(new Event('storage'));
     }
     
     return Promise.reject(error);
