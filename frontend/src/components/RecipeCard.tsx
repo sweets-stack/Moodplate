@@ -11,6 +11,7 @@ import {
   UilHeart
 } from '@iconscout/react-unicons';
 import { Recipe, SavedRecipe } from '../types/recipe';
+import { useAuth } from '../context/AuthContext';
 
 interface RecipeCardProps {
   recipe: Recipe | SavedRecipe;
@@ -19,7 +20,6 @@ interface RecipeCardProps {
   onDelete?: () => void;
   isSaved: boolean;
   compact?: boolean;
-  isLoggedIn?: boolean;
 }
 
 const RecipeCard: React.FC<RecipeCardProps> = ({
@@ -28,9 +28,9 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
   onRegenerate,
   onDelete,
   isSaved,
-  compact = false,
-  isLoggedIn = false
+  compact = false
 }) => {
+  const { isAuthenticated } = useAuth();
   const [showIngredients, setShowIngredients] = useState(true);
   const [showSteps, setShowSteps] = useState(true);
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
@@ -58,7 +58,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
   };
 
   const handleSaveClick = () => {
-    if (!isLoggedIn) {
+    if (!isAuthenticated) {
       navigate('/login', { state: { from: '/', message: 'Please log in to save recipes' } });
       return;
     }
