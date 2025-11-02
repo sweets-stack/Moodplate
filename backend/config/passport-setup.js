@@ -1,6 +1,7 @@
 ﻿import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { Strategy as GitHubStrategy } from 'passport-github2';
 import { Strategy as LocalStrategy } from 'passport-local';
+import crypto from 'crypto';
 import User from '../models/User.js';
 
 export default function(passport) {
