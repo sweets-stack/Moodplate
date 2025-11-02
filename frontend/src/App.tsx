@@ -351,15 +351,15 @@ function App() {
         <Header />
         <main className="flex-grow">
           <Routes>
-            <Route path="/" element={<MainPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
-            <Route path="/auth/callback" element={<AuthCallbackPage />} />
-            <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-            <Route path="/terms-of-service" element={<TermsOfServicePage />} />
-          </Routes>
+  <Route path="/" element={<MainPage />} />
+  <Route path="/login" element={<LoginPage />} />
+  <Route path="/register" element={<RegisterPage />} />
+  <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+  <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+  <Route path="/auth/callback" element={<AuthCallbackPage />} />
+  <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+  <Route path="/terms-of-service" element={<TermsOfServicePage />} />
+</Routes>
         </main>
         <Footer />
       </div>
