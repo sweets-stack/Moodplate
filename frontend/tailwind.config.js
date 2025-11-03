@@ -2,7 +2,7 @@
 export default {
   darkMode: 'class', // Enable class-based dark mode
   content: [
-    "./index.html",
+    "./moodplate-backend.onrender.com",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
